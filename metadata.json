@@ -1,0 +1,6 @@
+{
+  "name": "Weather Intelligence App",
+  "description": "A smart weather app with 7-day forecasting and AI-generated activity recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
