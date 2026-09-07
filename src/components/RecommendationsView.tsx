@@ -45,8 +45,11 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({ locati
           .filter(line => line.length > 0);
 
         setRecommendations(bulletPoints);
-      } catch (err) {
-        if (isMounted) setError('Could not generate recommendations for this day.');
+      } catch (err: any) {
+        if (isMounted) {
+          const serverError = err.response?.data?.error;
+          setError(serverError || 'Could not generate recommendations for this day.');
+        }
       } finally {
         if (isMounted) setLoading(false);
       }

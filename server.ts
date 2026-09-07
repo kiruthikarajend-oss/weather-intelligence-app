@@ -8,11 +8,23 @@ const PORT = 3000;
 
 app.use(express.json());
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!aiClient) {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error("GEMINI_API_KEY environment variable is missing. Please configure it in the Secrets panel.");
+    }
+    aiClient = new GoogleGenAI({ apiKey: key });
+  }
+  return aiClient;
+}
 
 // API routes FIRST
 app.post("/api/recommendations", async (req, res) => {
   try {
+    const ai = getAI();
     const { locationName, date, maxTemp, minTemp, weatherCode, precipitationProb } = req.body;
     const prompt = `You are a helpful travel and daily planning assistant. Based on the following weather forecast for ${locationName} on ${date}:
     - High: ${maxTemp}°C
@@ -30,7 +42,8 @@ app.post("/api/recommendations", async (req, res) => {
     res.json({ recommendations: response.text });
   } catch (error) {
     console.error("Error generating recommendations:", error);
-    res.status(500).json({ error: "Failed to generate recommendations" });
+    const message = error instanceof Error ? error.message : "Failed to generate recommendations";
+    res.status(500).json({ error: message });
   }
 });
 
